@@ -53,7 +53,6 @@ def get_data_loaders(
         ]
         ),
         "valid": transforms.Compose([
-            # YOUR CODE HERE
             transforms.Resize(256),
             transforms.RandomCrop(224),
             transforms.ToTensor(),
@@ -61,7 +60,6 @@ def get_data_loaders(
         ]
         ),
         "test": transforms.Compose([
-            # YOUR CODE HERE
             transforms.Resize(256),
             transforms.RandomCrop(224),
             transforms.ToTensor(),
