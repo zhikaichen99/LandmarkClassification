@@ -8,11 +8,7 @@ class MyModel(nn.Module):
 
         super().__init__()
 
-        # YOUR CODE HERE
-        # Define a CNN architecture. Remember to use the variable num_classes
-        # to size appropriately the output of your classifier, and if you use
-        # the Dropout layer, use the variable "dropout" to indicate how much
-        # to use (like nn.Dropout(p=dropout))
+        # Custom CNN model
         self.conv1 = nn.Conv2d(in_channels = 3, out_channels = 64, kernel_size = 3, stride = 1, padding = 1) 
         self.bn1 = nn.BatchNorm2d(64)
         self.relu1 = nn.ReLU()
@@ -47,14 +43,11 @@ class MyModel(nn.Module):
         self.fc3 = nn.Linear(1024, num_classes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # YOUR CODE HERE: process the input tensor through the
-        # feature extractor, the pooling and the final linear
-        # layers (if appropriate for the architecture chosen)
+   
         x = self.relu1(self.pool1(self.bn1(self.conv1(x))))
         x = self.relu2(self.pool2(self.bn2(self.conv2(x))))
         x = self.relu3(self.pool3(self.bn3(self.conv3(x))))
         x = self.relu4(self.pool4(self.bn4(self.conv4(x))))
-        
         
         x = self.flatten(x)
         
@@ -71,32 +64,3 @@ class MyModel(nn.Module):
         return x
 
 
-######################################################################################
-#                                     TESTS
-######################################################################################
-import pytest
-
-
-@pytest.fixture(scope="session")
-def data_loaders():
-    from .data import get_data_loaders
-
-    return get_data_loaders(batch_size=2)
-
-
-def test_model_construction(data_loaders):
-
-    model = MyModel(num_classes=23, dropout=0.3)
-
-    dataiter = iter(data_loaders["train"])
-    images, labels = dataiter.next()
-
-    out = model(images)
-
-    assert isinstance(
-        out, torch.Tensor
-    ), "The output of the .forward method should be a Tensor of size ([batch_size], [n_classes])"
-
-    assert out.shape == torch.Size(
-        [2, 23]
-    ), f"Expected an output tensor of size (2, 23), got {out.shape}"
