@@ -39,16 +39,8 @@ def get_data_loaders(
 
     print(f"Dataset mean: {mean}, std: {std}")
 
-    # YOUR CODE HERE:
-    # create 3 sets of data transforms: one for the training dataset,
-    # containing data augmentation, one for the validation dataset
-    # (without data augmentation) and one for the test set (again
-    # without augmentation)
-    # HINT: resize the image to 256 first, then crop them to 224, then add the
-    # appropriate transforms for that step
     data_transforms = {
         "train": transforms.Compose([
-            # YOUR CODE HERE
             transforms.Resize(256), # resize image to 256
             transforms.RandomCrop(224), # crop image to 224
             # Apply random affine transformations (rotation, translation, shear)
