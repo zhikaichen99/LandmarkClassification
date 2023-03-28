@@ -163,7 +163,7 @@ def visualize_one_batch(data_loaders, max_n: int = 5):
     images = invTrans(images)
 
     # Get class names from the train data loader
-    class_names  = data_loaders['train'].dataset.classes# YOUR CODE HERE
+    class_names  = data_loaders['train'].dataset.classes
 
     # Convert from BGR (the format used by pytorch) to RGB (the format expected by matplotlib)
     images = torch.permute(images, (0, 2, 3, 1)).clip(0, 1)
