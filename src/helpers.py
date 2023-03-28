@@ -44,7 +44,7 @@ def setup_env():
 
 def get_data_location():
     """
-    Find the location of the dataset, either locally or in the Udacity workspace
+    Find the location of the dataset
     """
 
     if os.path.exists("landmark_images"):
