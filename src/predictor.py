@@ -18,10 +18,8 @@ class Predictor(nn.Module):
         self.model = model.eval()
         self.class_names = class_names
 
-        # We use nn.Sequential and not nn.Compose because the former
-        # is compatible with torch.script, while the latter isn't
         self.transforms = nn.Sequential(
-            T.Resize([256, ]),  # We use single int value inside a list due to torchscript type restrictions
+            T.Resize([256, ]),  
             T.CenterCrop(224),
             T.ConvertImageDtype(torch.float),
             T.Normalize(mean.tolist(), std.tolist())
@@ -29,21 +27,23 @@ class Predictor(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
-            # 1. apply transforms
-            x  = self.transforms(x)# YOUR CODE HERE
-            # 2. get the logits
-            x  = self.model(x)# YOUR CODE HERE
-            # 3. apply softmax
-            #    HINT: remmeber to apply softmax across dim=1
-            x  = F.softmax(x, dim = 1)# YOUR CODE HERE
+            # apply image transforms
+            x  = self.transforms(x)
+            # get the logits
+            x  = self.model(x)
+            # apply softmax
+            x  = F.softmax(x, dim = 1)
 
             return x
 
 
 def predictor_test(test_dataloader, model_reloaded):
     """
-    Test the predictor. Since the predictor does not operate on the same tensors
-    as the non-wrapped model, we need a specific test function (can't use one_epoch_test)
+    Test the predictor.
+
+    Inputs:
+        test_dataloader
+        model_reloaded
     """
 
     folder = get_data_location()
@@ -67,44 +67,3 @@ def predictor_test(test_dataloader, model_reloaded):
     return truth, pred
 
 
-######################################################################################
-#                                     TESTS
-######################################################################################
-import pytest
-
-
-@pytest.fixture(scope="session")
-def data_loaders():
-    from .data import get_data_loaders
-
-    return get_data_loaders(batch_size=2)
-
-
-def test_model_construction(data_loaders):
-
-    from .model import MyModel
-    from .helpers import compute_mean_and_std
-
-    mean, std = compute_mean_and_std()
-
-    model = MyModel(num_classes=3, dropout=0.3)
-
-    dataiter = iter(data_loaders["train"])
-    images, labels = dataiter.next()
-
-    predictor = Predictor(model, class_names=['a', 'b', 'c'], mean=mean, std=std)
-
-    out = predictor(images)
-
-    assert isinstance(
-        out, torch.Tensor
-    ), "The output of the .forward method should be a Tensor of size ([batch_size], [n_classes])"
-
-    assert out.shape == torch.Size(
-        [2, 3]
-    ), f"Expected an output tensor of size (2, 3), got {out.shape}"
-
-    assert torch.isclose(
-        out[0].sum(),
-        torch.Tensor([1]).squeeze()
-    ), "The output of the .forward method should be a softmax vector with sum = 1"
